@@ -439,3 +439,9 @@
   {:added "1.2"}
   ([n] (resource n (.getContextClassLoader (Thread/currentThread))))
   ([n ^ClassLoader loader] (.getResource loader n)))
+
+(defn ^InputStream stream-resource
+  "Returns an InputStream for a named resource. Use the context class loader
+   if no loader is specified."
+   ([n] (stream-resource n (.getContextClassLoader (Thread/currentThread))))
+   ([n ^ClassLoader loader] (.getResourceAsStream loader n)))

@@ -139,6 +139,15 @@
     (spit r "foobar")
     (is (= "foobar" (slurp r)))))
 
+(deftest test-streaming-resources-with-spaces
+  (let [file-with-spaces (temp-file "test resource 2" "txt")
+        url (as-url (.getParentFile file-with-spaces))
+        loader (java.net.URLClassLoader. (into-array [url]))
+        r (stream-resource (.getName file-with-spaces) loader)]
+    (is (= r (as-url file-with-spaces)))
+    (spit r "foobar")
+    (is (= "foobar" (slurp r)))))
+
 (deftest test-file
   (are [result args] (= (File. result) (apply file args))
        "foo" ["foo"]
@@ -206,6 +215,15 @@
         loader (java.net.URLClassLoader. (into-array [url]))]
     (is (nil? (resource "non/existent/resource" loader)))
     (is (instance? URL (resource (.getName file) loader)))))
+
+(deftest test-stream-resource
+  (is (nil? (stream-resource "non/existent/resource")))
+  (is (instance? InputStream (stream-resource "clojure/core.clj")))
+  (let [file (temp-file "test-resource" "txt")
+        url (as-url (.getParentFile file))
+        loader (java.net.URLClassLoader. (into-array [url]))]
+    (is (nil? (stream-resource "non/existent/resource" loader)))
+    (is (instance? InputStream (stream-resource (.getName file) loader)))))
 
 (deftest test-make-parents
   (let [tmp (System/getProperty "java.io.tmpdir")]
